@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Select Quiz</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#classSelect').change(function() {
+                var classId = $(this).val();
+                console.log('Selected classId:', classId);
+                if (classId) {
+                    $.get('/subjects?classId=' + classId, function(subjects) {
+                        console.log('Subjects:', subjects);
+                        $('#subjectSelect').empty().append('<option value="">Select Subject</option>');
+                        subjects.forEach(function(sub) {
+                            $('#subjectSelect').append('<option value="' + sub.id + '">' + sub.name + '</option>');
+                        });
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                        console.error('Error fetching subjects:', textStatus, errorThrown);
+                        alert('Failed to load subjects. Please try again.');
+                    });
+                }
+            });
+
+            $('#subjectSelect').change(function() {
+                var subjectId = $(this).val();
+                console.log('Selected subjectId:', subjectId);
+                if (subjectId) {
+                    $.get('/chapters?subjectId=' + subjectId, function(chapters) {
+                        console.log('Chapters:', chapters);
+                        $('#chapterSelect').empty().append('<option value="">Select Chapter</option>');
+                        chapters.forEach(function(chap) {
+                            $('#chapterSelect').append('<option value="' + chap.id + '">' + chap.name + '</option>');
+                        });
+                        $('#chapterPdfSelect').empty().append('<option value="">Select Chapter for PDF Upload</option>');
+                        chapters.forEach(function(chap) {
+                            $('#chapterPdfSelect').append('<option value="' + chap.id + '">' + chap.name + '</option>');
+                        });
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                        console.error('Error fetching chapters:', textStatus, errorThrown);
+                        alert('Failed to load chapters. Please try again.');
+                    });
+                }
+            });
+
+            $('form#quizForm').submit(function(event) {
+                if (!$('#classSelect').val() || !$('#subjectSelect').val() || !$('#chapterSelect').val()) {
+                    alert('Please select a class, subject, and chapter.');
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Select Class, Subject, and Chapter</h1>
+    <div th:if="${error}" style="color: red;" th:text="${error}"></div>
+    <div th:if="${success}" style="color: green;" th:text="${success}"></div>
+    <form id="quizForm" action="/create-test" method="post">
+        <label>Class:</label>
+        <select id="classSelect" name="classId">
+            <option value="">Select Class</option>
+            <th:block th:each="cls : ${classes}">
+                <option th:value="${cls.id}" th:text="${cls.name}"></option>
+            </th:block>
+        </select><br/>
+
+        <label>Subject:</label>
+        <select id="subjectSelect" name="subjectId">
+            <option value="">Select Subject</option>
+        </select><br/>
+
+        <label>Chapter:</label>
+        <select id="chapterSelect" name="chapterId">
+            <option value="">Select Chapter</option>
+        </select><br/>
+
+        <button type="submit">Create Test</button>
+    </form>
+
+    <!-- New PDF Upload Form -->
+    <h2>Upload PDF for Chapter</h2>
+    <form action="/upload-pdf" method="post" enctype="multipart/form-data">
+        <label>Chapter:</label>
+        <select id="chapterPdfSelect" name="chapterId">
+            <option value="">Select Chapter for PDF Upload</option>
+        </select><br/>
+
+        <label>PDF File:</label>
+        <input type="file" name="pdfFile" accept=".pdf"><br/>
+
+        <button type="submit">Upload PDF</button>
+    </form>
+</body>
+</html>

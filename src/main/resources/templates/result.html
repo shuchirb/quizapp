@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Test Result</title>
+</head>
+<body>
+    <h1>Your Score: <span th:text="${score} + '/' + ${total}"></span></h1>
+    <h2>Answers:</h2>
+    <th:block th:each="q, iter : ${questions}">
+        <p th:text="${iter.index + 1} + '. ' + ${q.text}"></p>
+        <p>Your Answer: <span th:text="${userAnswers.get(q.id)} ?: 'Not answered'"></span></p>
+        <p>Correct Answer: <span th:text="${q.correctOption} + ' - ' + ${q['option' + q.correctOption]}"></span></p>
+        <hr/>
+    </th:block>
+</body>
+</html>

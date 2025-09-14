@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Take Test</title>
+</head>
+<body>
+    <h1>Test Questions</h1>
+    <form action="/submit-test" method="post">
+        <input type="hidden" name="chapterId" th:value="${chapterId}"/>
+        <input type="hidden" name="subjectName" th:value="${subjectName}"/>
+        <input type="hidden" name="chapterName" th:value="${chapterName}"/>
+        <th:block th:each="q, iter : ${questions}">
+            <p th:text="${iter.index + 1} + '. ' + ${q.text}"></p>
+            <input type="radio" th:name="'answer_' + ${q.id}" value="A" /> <span th:text="${q.optionA}"></span><br/>
+            <input type="radio" th:name="'answer_' + ${q.id}" value="B" /> <span th:text="${q.optionB}"></span><br/>
+            <input type="radio" th:name="'answer_' + ${q.id}" value="C" /> <span th:text="${q.optionC}"></span><br/>
+            <input type="radio" th:name="'answer_' + ${q.id}" value="D" /> <span th:text="${q.optionD}"></span><br/>
+        </th:block>
+        <button type="submit">Submit Test</button>
+    </form>
+</body>
+</html>
